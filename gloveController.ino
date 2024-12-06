@@ -70,18 +70,18 @@ enum PITCHAXIS {FORWARD, WAIT, BACK} aState = WAIT;
 void movementMotion(void)   {  
   switch (aState)    {
       case WAIT:
-          if (pitch > 50.0)  {aState = FORWARD;}   
-          else if (pitch < -50.0)  {aState = BACK;}
+          if (pitch > 40.0)  {aState = FORWARD;}   
+          else if (pitch < -60.0)  {aState = BACK;}
           else {aState = WAIT;}
       break;
 
       case FORWARD:
-          if (pitch > 50.0)   {aState = FORWARD;}
+          if (pitch > 40.0)   {aState = FORWARD;}
           else {aState = WAIT;}
       break;
 
       case BACK:
-          if (pitch < -50.0) {aState = BACK;}
+          if (pitch < -60.0) {aState = BACK;}
           else {aState = WAIT;}
       break;
 
