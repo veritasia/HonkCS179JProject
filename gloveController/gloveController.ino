@@ -197,8 +197,6 @@ void loop() {
   roll = atan2(Y, Z)*180.0/PI;
   pitch = atan2(-X, sqrt(Y*Y+Z*Z))*180.0/PI; //works around roll values
 
-  String packet = MakeSendPacket(0, pitch_packet, roll_packet, finger_packet);
-  Serial.println(packet);
 //  Serial.print("roll = ");
 //  Serial.print(roll,1);
 //  Serial.print(", pitch = ");
@@ -206,6 +204,12 @@ void loop() {
 //  delay(100);
   
   touchButtonCheck(&touchButton1);   //might need an inital set for horn = 0
+  if (touchButton1.hornState) {
+    finger_packet = 1;
+  }
+  else {
+    finger_packet = 0;
+  }
   //testing
 //  Serial.print(touchButton1.valueType);
   delay(10);
@@ -215,4 +219,7 @@ pivotMotion();      //calls pivot SM - prints LEFT and RIGHT
 Serial.println("");
 movementMotion();   //calls pitch SM - print FORWARD and BACK
 Serial.println("");
+
+String packet = MakeSendPacket(0, pitch_packet, roll_packet, finger_packet);
+Serial.println(packet);
 }
