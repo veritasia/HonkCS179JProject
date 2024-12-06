@@ -7,19 +7,21 @@ bool fwd_flag = false;
 bool back_flag = false;
 bool right_flag = false;
 bool left_flag = false;
+int time_since_packet = 500;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   wdt_enable(WDTO_2S);
   //mots.Dd_Set_Motor_Init();
-  
-
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   //mots.Dd_Set_Motor_Init();
+  if (time_since_packet > 500) {
+    mots.Dd_Set_Motor_Control(direction_reverse, 0, direction_reverse, 0, false);
+  }
   if (Serial.available()) {
     char* data = ParseReceivePacket(Serial.readString());
     uint8_t pitch = uint8_t(data[0]);
@@ -93,6 +95,6 @@ void loop() {
     // stop
     mots.Dd_Set_Motor_Control(direction_reverse, 0, direction_reverse, 0, false);
   }
-  
-  
+  delay(10);
+  time_since_packet += 10;
 }
