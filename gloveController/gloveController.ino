@@ -3,9 +3,12 @@
 #include <Wire.h>
 #include "radio_utils.h"
 #include "String.h"
+#include <SoftwareSerial.h>
 #define THRES 200   //descrease for better button retention
 #define SAMPLES 20  //i think ^ || but quicker
 #define LED1 3      //D3
+
+SoftwareSerial lora(2, 3);
 
 typedef struct touchButton{
   int button;
@@ -26,7 +29,7 @@ float X, Y, Z, roll, pitch;
 float value1;
 uint8_t pitch_packet = 127;
 uint8_t roll_packet = 127;
-uint8_t finger_packet = 0;
+uint8_t finger_packet = 1;
 
 enum ROLLAXIS {LEFT, HOLD, RIGHT} dState = HOLD;
 void pivotMotion(void)   { 
@@ -64,7 +67,7 @@ void pivotMotion(void)   {
       break;
       
       case LEFT:
-          roll_packet = 0;
+          roll_packet = 1;
       break;
 
       default:
@@ -106,7 +109,7 @@ void movementMotion(void)   {
       break;
       
       case BACK:
-          pitch_packet = 0;
+          pitch_packet = 1;
       break;
 
       default:
@@ -173,7 +176,12 @@ void setup() {
   Wire.write(0x6B);                                  
   Wire.write(0);
   Wire.endTransmission(true);                        
+  lora.begin(115200);
+  lora.println("AT+IPR=9600");
+  lora.begin(9600);
+  String response = lora.readString();
   Serial.begin(9600);
+  Serial.println(response);
   pinMode(A0, INPUT_PULLUP);  //this is our reference pin for voltage/capitance
   analogRead(A0);
 
@@ -205,10 +213,10 @@ void loop() {
   
   touchButtonCheck(&touchButton1);   //might need an inital set for horn = 0
   if (touchButton1.hornState) {
-    finger_packet = 1;
+    finger_packet = 2;
   }
   else {
-    finger_packet = 0;
+    finger_packet = 1;
   }
   //testing
 //  Serial.print(touchButton1.valueType);
@@ -216,10 +224,21 @@ void loop() {
   digitalWrite(LED1, touchButton1.hornState);
 
 pivotMotion();      //calls pivot SM - prints LEFT and RIGHT
-Serial.println("");
+// Serial.println("");
 movementMotion();   //calls pitch SM - print FORWARD and BACK
-Serial.println("");
+// Serial.println("");
 
+lora.println("AT");
+String response = lora.readString();
+Serial.println("AT");
+Serial.println(response);
 String packet = MakeSendPacket(0, pitch_packet, roll_packet, finger_packet);
+lora.println(packet);
 Serial.println(packet);
+Serial.println(String(pitch_packet));
+Serial.println(String(roll_packet));
+Serial.println(String(finger_packet));
+Serial.println(String(packet.length()));
+response = lora.readString();
+Serial.println(response);
 }

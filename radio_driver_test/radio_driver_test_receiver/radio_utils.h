@@ -31,7 +31,8 @@ char* ParseReceivePacket(String packet) {
     int startOfPayload = 0;
     char raw_packet[30];
     
-    strcpy(raw_packet, packet.c_str());
+    packet.toCharArray(raw_packet, 30);
+    // strcpy(raw_packet, packet.c_str());
     char* data = strtok(raw_packet, ",");
     data = strtok(NULL, ",");
     data = strtok(NULL, ",");

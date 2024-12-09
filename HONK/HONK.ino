@@ -1,7 +1,9 @@
 #include <avr/wdt.h>
 #include "DeviceDrivers.h"
 #include "radio_utils.h"
+#include <SoftwareSerial.h>
 
+SoftwareSerial lora(62, 34);
 Dd_Set_Motor mots;
 bool fwd_flag = false;
 bool back_flag = false;
@@ -11,7 +13,8 @@ int time_since_packet = 500;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(115200);
+  lora.begin(9600);
+  Serial.begin(9600);
   wdt_enable(WDTO_2S);
   //mots.Dd_Set_Motor_Init();
 }
@@ -19,14 +22,19 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   //mots.Dd_Set_Motor_Init();
-  if (time_since_packet > 500) {
-    mots.Dd_Set_Motor_Control(direction_reverse, 0, direction_reverse, 0, false);
-  }
-  if (Serial.available()) {
-    char* data = ParseReceivePacket(Serial.readString());
-    uint8_t pitch = uint8_t(data[0]);
-    uint8_t roll = uint8_t(data[1]);
-    uint8_t fingerstate = uint8_t(data[2]);
+  // if (time_since_packet > 5000) {
+  //   mots.Dd_Set_Motor_Control(direction_reverse, 0, direction_reverse, 0, false);
+  // }
+  if (lora.available()) {
+    time_since_packet = 0;
+    String data = lora.readString();
+    Serial.println(data);
+    uint8_t pitch = uint8_t(data[9]);
+    uint8_t roll = uint8_t(data[10]);
+    uint8_t fingerstate = uint8_t(data[11]);
+    Serial.println("pitch " + String(pitch));
+    Serial.println("roll " + String(roll));
+    Serial.println("finger " + String(fingerstate));
 
     // set flags
     if (pitch > 200) {

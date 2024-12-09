@@ -20,9 +20,9 @@ String MakeSendPacket(const int destinationID, uint8_t pitch, uint8_t roll, uint
     String packet = "AT+SEND="; 
     packet += String(destinationID); 
     packet += ",3,";
-    packet += String(char(pitch)); 
-    packet += String(char(roll));
-    packet += String(char(fingerState));
+    packet.concat(String(char(pitch))); 
+    packet.concat(String(char(roll)));
+    packet.concat(String(char(fingerState)));
     return packet;
 }
 
