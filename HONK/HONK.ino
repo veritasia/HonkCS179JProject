@@ -25,6 +25,7 @@ void loop() {
   // if (time_since_packet > 5000) {
   //   mots.Dd_Set_Motor_Control(direction_reverse, 0, direction_reverse, 0, false);
   // }
+        // mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 2, direction_forward, Max_speed / 2, true);
   if (lora.available()) {
     time_since_packet = 0;
     String data = lora.readString();
@@ -35,7 +36,7 @@ void loop() {
     Serial.println("pitch " + String(pitch));
     Serial.println("roll " + String(roll));
     Serial.println("finger " + String(fingerstate));
-
+    
     // set flags
     if (pitch > 200) {
       fwd_flag = true;
@@ -61,48 +62,57 @@ void loop() {
     else {
       left_flag = false;
       right_flag = false;
+    }    
+
+  //   if (right_flag && !(fwd_flag || back_flag)) {
+  //     // go right
+  //     mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 2, direction_reverse, Max_speed / 2, true);
+  //   }
+  //   else if (left_flag && !(fwd_flag || back_flag)) {
+  //     // go left
+  //     mots.Dd_Set_Motor_Control(direction_reverse, Max_speed / 2, direction_forward, Max_speed / 2, true);
+  //   }
+
+  //   if (!(fwd_flag && back_flag && right_flag && left_flag)) {
+  //     // stop
+  //     mots.Dd_Set_Motor_Control(direction_reverse, 0, direction_reverse, 0, false);
+  //   }
+  // }    
+  }
+  if(fwd_flag){
+      if(left_flag){
+        mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 4, direction_forward, Max_speed / 2, true);
+      }
+      else if(right_flag){
+        mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 2, direction_forward, Max_speed / 4, true);
+      }
+      else {
+        mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 2, direction_forward, Max_speed / 2, true);
+      }
     }
-  }
+    else if(back_flag){
+      if(left_flag){
+        mots.Dd_Set_Motor_Control(direction_reverse, Max_speed / 4, direction_reverse, Max_speed / 2, true);
+      }
+      else if(right_flag){
+        mots.Dd_Set_Motor_Control(direction_reverse, Max_speed / 2, direction_reverse, Max_speed / 4, true);
 
-  if (fwd_flag && !(right_flag || left_flag)) {
-    // go forward
-    mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 2, direction_forward, Max_speed / 2, true);
-  }
-  else if (fwd_flag && left_flag) {
-    // go forward left
-    mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 4, direction_forward, Max_speed / 2, true);
-  }
-  else if (fwd_flag && right_flag) {
-    // go forward right
-    mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 2, direction_forward, Max_speed / 4, true);
-  }
-
-  if (back_flag && !(right_flag || left_flag)) {
-    // go back
-    mots.Dd_Set_Motor_Control(direction_reverse, Max_speed / 2, direction_reverse, Max_speed / 2, true);
-  }
-  else if (back_flag && left_flag) {
-    // go back left
-    mots.Dd_Set_Motor_Control(direction_reverse, Max_speed / 4, direction_reverse, Max_speed / 2, true);
-  }
-  else if (back_flag && right_flag) {
-    // go back right
-    mots.Dd_Set_Motor_Control(direction_reverse, Max_speed / 2, direction_reverse, Max_speed / 4, true);
-  }
-
-  if (right_flag && !(fwd_flag || back_flag)) {
-    // go right
-    mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 2, direction_reverse, Max_speed / 2, true);
-  }
-  else if (left_flag && !(fwd_flag || back_flag)) {
-    // go left
-    mots.Dd_Set_Motor_Control(direction_reverse, Max_speed / 2, direction_forward, Max_speed / 2, true);
-  }
-
-  if (!(fwd_flag && back_flag && right_flag && left_flag)) {
-    // stop
-    mots.Dd_Set_Motor_Control(direction_reverse, 0, direction_reverse, 0, false);
-  }
-  delay(10);
+      }
+      else {
+        mots.Dd_Set_Motor_Control(direction_reverse, Max_speed / 2, direction_reverse, Max_speed / 2, true);
+      }
+    }
+    else {
+      if(left_flag){
+        mots.Dd_Set_Motor_Control(direction_reverse, Max_speed / 2, direction_forward, Max_speed / 2, true);
+      }
+      else if(right_flag){
+        mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 2, direction_reverse, Max_speed / 2, true);
+      }
+      else {
+        mots.Dd_Set_Motor_Control(direction_reverse, 0, direction_reverse, 0, false);
+      }
+    }
+  delay(20);
   time_since_packet += 10;
 }
