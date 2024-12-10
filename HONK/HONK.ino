@@ -16,7 +16,9 @@ void setup() {
   lora.begin(9600);
   Serial.begin(9600);
   wdt_enable(WDTO_2S);
+  pinMode(40, OUTPUT);
   //mots.Dd_Set_Motor_Init();
+  digitalWrite(40, LOW);
 }
 
 void loop() {
@@ -26,6 +28,7 @@ void loop() {
   //   mots.Dd_Set_Motor_Control(direction_reverse, 0, direction_reverse, 0, false);
   // }
         // mots.Dd_Set_Motor_Control(direction_forward, Max_speed / 2, direction_forward, Max_speed / 2, true);
+        
   if (lora.available()) {
     time_since_packet = 0;
     String data = lora.readString();
@@ -35,7 +38,17 @@ void loop() {
     uint8_t fingerstate = uint8_t(data[11]);
     Serial.println("pitch " + String(pitch));
     Serial.println("roll " + String(roll));
-    Serial.println("finger " + String(fingerstate));
+    Serial.println("finger " + String(fingerstate));    
+    
+
+    if(fingerstate == 2){
+      digitalWrite(40, HIGH);
+      delay(500);
+      digitalWrite(40, LOW);
+    }
+    else {
+      digitalWrite(40, LOW);
+    }
     
     // set flags
     if (pitch > 200) {
